@@ -120,17 +120,14 @@ trait RouterN[+A] { self =>
     this andThen that
 
   /**
-   * Maps this router to the given function `A => B`.
-   */
-  def />[B](fn: A => B): RouterN[B] =
-    this map fn
-
-  /**
    * Sequentially composes this router with the given `that` router. The resulting router will succeed if either this or
    * `that` routers are succeed.
+   *
+   * Router composition via `orElse` operator happens in a _greedy_ manner: it minimizes the output route tail. Thus, if
+   * both of the routers can handle the given `route` the router is being chosen is that which eats more.
    */
   def |[B >: A](that: RouterN[B]): RouterN[B] =
-    this orElse that
+   self orElse that
 
   // A workaround for https://issues.scala-lang.org/browse/SI-1336
   def withFilter(p: A => Boolean): RouterN[A] = self
